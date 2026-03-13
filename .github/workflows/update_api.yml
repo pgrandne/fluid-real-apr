@@ -46,8 +46,21 @@ jobs:
 
       - name: Commit and Push
         run: |
+          # 1. Debug : Afficher le contenu de data.json dans les logs pour être sûr
+          echo "Contenu du fichier avant commit :"
+          cat data.json
+
+          # 2. Configuration Git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 3. On ajoute le fichier
           git add data.json
-          git commit -m "Auto-update data: $(date)" || exit 0
-          git push
+          
+          # 4. On commit seulement s'il y a des changements
+          if git diff --staged --quiet; then
+            echo "Aucun changement à enregistrer."
+          else
+            git commit -m "Auto-update data: $(date -u)"
+            git push origin main
+          fi
