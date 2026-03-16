@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -26,16 +26,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Transaction } from "@/types/interface";
-
-export const description = "An interactive area chart";
+import fluidData from "@/data.json";
+import { groupByDay } from "@/lib/utils";
 
 const chartConfig = {
-  fluid_APY: {
-    label: "Fluid displayed API",
+  fluid_APR: {
+    label: "Fluid displayed APR",
     color: "var(--chart-1)",
   },
-  real_APY: {
-    label: "Real APY calculated",
+  real_APR: {
+    label: "Real APR calculated",
     color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
@@ -45,27 +45,48 @@ type ChartProps = {
   readonly userDeposit: number;
 };
 
+const CustomLabel = ({
+  x,
+  y,
+  value,
+}: {
+  x: number;
+  y: number;
+  value: number;
+}) => (
+  <text x={x} y={y - 8} textAnchor="end" fontSize={11} fill="#666">
+    {`${value.toFixed(1)}%`}
+  </text>
+);
+
 export function ChartAreaInteractive({
   profitsAction,
   userDeposit,
 }: ChartProps) {
   const [timeRange, setTimeRange] = React.useState("90d");
 
-  const chartData = profitsAction
+  const addressData = profitsAction
     .map((tx) => {
       const date = new Date(tx.created_at).toISOString().split("T")[0];
 
       return {
         date,
-        fluid_APY: userDeposit
+        real_APR: userDeposit
           ? ((Number.parseFloat(tx.amount) * 365) / userDeposit) * 100
           : 0,
-        real_APY: Number.parseFloat(tx.amount_in_usd),
       };
     })
     .reverse();
 
-  const filteredData = chartData.filter((item) => {
+  const agregatedFluidData = groupByDay(fluidData).map((fData) => {
+    const match = addressData.find((aData) => aData.date === fData.date);
+    return {
+      ...fData,
+      real_APR: match?.real_APR ?? undefined,
+    };
+  });
+
+  const filteredData = agregatedFluidData.filter((item) => {
     const date = new Date(item.date);
     const referenceDate = new Date();
     let daysToSubtract = 90;
@@ -129,24 +150,24 @@ export function ChartAreaInteractive({
               <linearGradient id="fillFluid" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="50%"
-                  stopColor="var(--color-fluid_APY)"
+                  stopColor="var(--color-fluid_APR)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-fluid_APY)"
+                  stopColor="var(--color-fluid_APR)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
               <linearGradient id="fillReal" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-real_APY)"
+                  stopColor="var(--color-real_APR)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-real_APY)"
+                  stopColor="var(--color-real_APR)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -166,6 +187,12 @@ export function ChartAreaInteractive({
                 });
               }}
             />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => `${value.toFixed(1)}%`}
+            />
             <ChartTooltip
               cursor={false}
               content={
@@ -180,19 +207,26 @@ export function ChartAreaInteractive({
                 />
               }
             />
+            {addressData.length > 0 && (
+              <Area
+                dataKey="real_APR"
+                type="natural"
+                fill="url(#fillReal)"
+                stroke="var(--color-real_APR)"
+                label={{
+                  position: "top",
+                  formatter: (value: number) => `${value.toFixed(1)}%`,
+                  fontSize: 11,
+                  fill: "var(--color-real_APR)",
+                }}
+              />
+            )}
             <Area
-              dataKey="real_APY"
-              type="natural"
-              fill="url(#fillReal)"
-              stroke="var(--color-real_APY)"
-              stackId="a"
-            />
-            <Area
-              dataKey="fluid_APY"
+              dataKey="fluid_APR"
               type="natural"
               fill="url(#fillFluid)"
-              stroke="var(--color-fluid_APY)"
-              stackId="a"
+              stroke="var(--color-fluid_APR)"
+              label={<CustomLabel x={0} y={0} value={0} />}
             />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
