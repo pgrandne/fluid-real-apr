@@ -18,7 +18,7 @@ const fontMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Fluid Real APY",
   description:
-    "Comparison between Fluid displayed APY and real APY calculated on distributed interest",
+    "Comparison between Fluid displayed APR and real APR calculated on distributed interest",
 };
 
 export default function RootLayout({
