@@ -40,7 +40,6 @@ export const ExportDistributedInterest = ({
   profitsAction: Transaction[];
 }) => {
   const handleExport = React.useCallback(() => {
-    console.log(profitsAction);
     const json = JSON.stringify(profitsAction, null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -64,7 +63,7 @@ export const ExportDistributedInterest = ({
       <Download className="size-4" />
       <span className="flex flex-col">
         <span className="">Export Distributed interest</span>
-        <span className="">for this adress</span>
+        <span className="">for this address</span>
       </span>
     </Button>
   );
