@@ -24,39 +24,20 @@ export function SearchInput({
     try {
       setLoading(true);
 
-      const now = new Date();
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(now.getFullYear() - 1);
-
-      const res1 = await fetch(
-        `https://api.instadapp.io/v2/mainnet/lite/users/${wallet}/vaults`,
-      );
-
-      if (!res1.ok) throw new Error("API error");
-
-      const userData = await res1.json();
-      const deposit = Number.parseFloat(userData[0].userSupplyAmount);
-
-      setUserDeposit(deposit);
-
-      const params = new URLSearchParams({
-        "types[]": "profit",
-        from_date: oneYearAgo.toISOString(),
-        to_date: now.toISOString(),
-        user_address: wallet,
-        per_page: "365",
-        page: "1",
+      const res = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ wallet }),
       });
 
-      const res2 = await fetch(
-        `https://lite.api.instadapp.io/mainnet/transaction-actions?${params}`,
-      );
+      if (!res.ok) throw new Error("API error");
 
-      if (!res2.ok) throw new Error("API error");
+      const result = await res.json();
 
-      const result = await res2.json();
-
-      setProfitsAction(result.data ?? []);
+      setUserDeposit(Number(result?.deposit ?? 0));
+      setProfitsAction(result?.transactions ?? []);
     } catch (err) {
       console.error(err);
       setProfitsAction([]);
