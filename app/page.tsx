@@ -8,13 +8,15 @@ import {
 } from "@/components/ExportFluid";
 import { Header } from "@/components/Header";
 import { SearchInput } from "@/components/SearchInput";
+import { Toggle } from "@/components/ui/toggle";
 import { Transaction } from "@/types/interface";
-import { GithubIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, GithubIcon } from "lucide-react";
 import { useState } from "react";
 
 export default function Page() {
   const [profitsAction, setProfitsAction] = useState<Transaction[]>([]);
   const [userDeposit, setUserDeposit] = useState(0);
+  const [hidden, setHidden] = useState(false);
 
   return (
     <div className="flex min-h-screen w-full flex-col p-6">
@@ -33,10 +35,21 @@ export default function Page() {
             <AverageTable
               profitsAction={profitsAction}
               userDeposit={userDeposit}
+              hidden={hidden}
             />
           </div>
           <div className="w-full max-w-65">
             <div className="flex flex-col space-y-4">
+              <Toggle
+                aria-label="Toggle bookmark"
+                size="sm"
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => setHidden(!hidden)}
+              >
+                {hidden ? <EyeOffIcon /> : <EyeIcon />}
+                Interest
+              </Toggle>
               <ExportFluidDailyAPR />
               {profitsAction.length > 0 && (
                 <ExportDistributedInterest profitsAction={profitsAction} />

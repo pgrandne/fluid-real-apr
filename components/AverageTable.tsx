@@ -12,7 +12,11 @@ import fluidData from "@/data.json";
 import { averageAllDays, formatReadableDate } from "@/lib/utils";
 import { ChartProps } from "@/types/interface";
 
-export const AverageTable = ({ profitsAction, userDeposit }: ChartProps) => {
+export const AverageTable = ({
+  profitsAction,
+  userDeposit,
+  hidden,
+}: ChartProps & { hidden: boolean }) => {
   const displayedAvgAPR = averageAllDays(fluidData);
   const totalInterest =
     displayedAvgAPR && userDeposit > 0
@@ -73,7 +77,9 @@ export const AverageTable = ({ profitsAction, userDeposit }: ChartProps) => {
           <TableCell className="text-center">
             {displayedAvgAPR?.avg_fluid_APR} %
           </TableCell>
-          <TableCell className="text-center">{displayedInterest}</TableCell>
+          <TableCell className="text-center">
+            {hidden ? "••••••" : displayedInterest}
+          </TableCell>
         </TableRow>
         <TableRow key="real_APR">
           <TableCell className="font-medium">
@@ -81,14 +87,16 @@ export const AverageTable = ({ profitsAction, userDeposit }: ChartProps) => {
           </TableCell>
           <TableCell className="text-center">{distributedPercentage}</TableCell>
           <TableCell className="text-center">
-            {distributedInterestDisplayed}
+            {hidden ? "••••••" : distributedInterestDisplayed}
           </TableCell>
         </TableRow>
       </TableBody>
       <TableFooter>
         <TableRow>
           <TableCell colSpan={2}>Missing Income</TableCell>
-          <TableCell className="text-right">{missingIncome}</TableCell>
+          <TableCell className="text-center">
+            {hidden ? "••••••" : missingIncome}
+          </TableCell>
         </TableRow>
       </TableFooter>
     </Table>
