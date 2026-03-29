@@ -15,8 +15,12 @@ import { ChartProps } from "@/types/interface";
 export const AverageTable = ({
   profitsAction,
   userDeposit,
-  hidden,
-}: ChartProps & { hidden: boolean }) => {
+  ethValue,
+  options,
+}: ChartProps & {
+  ethValue: number;
+  options: { hidden: boolean; usd: boolean };
+}) => {
   const displayedAvgAPR = averageAllDays(fluidData);
   const totalInterest =
     displayedAvgAPR && userDeposit > 0
@@ -24,8 +28,17 @@ export const AverageTable = ({
         (displayedAvgAPR.avg_fluid_APR / 100) *
         (displayedAvgAPR.nb_Days / 365)
       : 0;
+
+  const displayValue = (amount: number) => {
+    if (options.usd) {
+      return `${(amount * ethValue).toFixed(2)} $`;
+    } else {
+      return `${amount.toFixed(6)} eth`;
+    }
+  };
+
   const displayedInterest =
-    totalInterest > 0 ? `${totalInterest.toFixed(6)} eth` : "";
+    totalInterest > 0 ? displayValue(totalInterest) : "";
 
   const oldestDay = displayedAvgAPR?.oldest_Day ?? null;
   const totalDistributedInterest = profitsAction.reduce((sum, tx) => {
@@ -46,13 +59,11 @@ export const AverageTable = ({
       : "";
 
   const distributedInterestDisplayed =
-    totalDistributedInterest > 0
-      ? `${totalDistributedInterest.toFixed(6)} eth`
-      : "";
+    totalDistributedInterest > 0 ? displayValue(totalDistributedInterest) : "";
 
   const missingIncome =
     totalInterest > 0 && totalDistributedInterest > 0
-      ? `${(totalInterest - totalDistributedInterest).toFixed(6)} eth`
+      ? displayValue(totalInterest - totalDistributedInterest)
       : "";
 
   return (
@@ -78,7 +89,7 @@ export const AverageTable = ({
             {displayedAvgAPR?.avg_fluid_APR} %
           </TableCell>
           <TableCell className="text-center">
-            {hidden ? "••••••" : displayedInterest}
+            {options.hidden ? "••••••" : displayedInterest}
           </TableCell>
         </TableRow>
         <TableRow key="real_APR">
@@ -87,7 +98,7 @@ export const AverageTable = ({
           </TableCell>
           <TableCell className="text-center">{distributedPercentage}</TableCell>
           <TableCell className="text-center">
-            {hidden ? "••••••" : distributedInterestDisplayed}
+            {options.hidden ? "••••••" : distributedInterestDisplayed}
           </TableCell>
         </TableRow>
       </TableBody>
@@ -95,7 +106,7 @@ export const AverageTable = ({
         <TableRow>
           <TableCell colSpan={2}>Missing Income</TableCell>
           <TableCell className="text-center">
-            {hidden ? "••••••" : missingIncome}
+            {options.hidden ? "••••••" : missingIncome}
           </TableCell>
         </TableRow>
       </TableFooter>

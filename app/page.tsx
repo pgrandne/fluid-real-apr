@@ -8,6 +8,8 @@ import {
 } from "@/components/ExportFluid";
 import { Header } from "@/components/Header";
 import { SearchInput } from "@/components/SearchInput";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Toggle } from "@/components/ui/toggle";
 import { Transaction } from "@/types/interface";
 import { EyeIcon, EyeOffIcon, GithubIcon } from "lucide-react";
@@ -16,7 +18,8 @@ import { useState } from "react";
 export default function Page() {
   const [profitsAction, setProfitsAction] = useState<Transaction[]>([]);
   const [userDeposit, setUserDeposit] = useState(0);
-  const [hidden, setHidden] = useState(false);
+  const [ethValue, setEthValue] = useState(0);
+  const [options, setOptions] = useState({ hidden: false, usd: false });
 
   return (
     <div className="flex min-h-screen w-full flex-col p-6">
@@ -25,6 +28,7 @@ export default function Page() {
         <SearchInput
           setProfitsAction={setProfitsAction}
           setUserDeposit={setUserDeposit}
+          setEthValue={setEthValue}
         />
         <ChartAreaInteractive
           profitsAction={profitsAction}
@@ -35,21 +39,40 @@ export default function Page() {
             <AverageTable
               profitsAction={profitsAction}
               userDeposit={userDeposit}
-              hidden={hidden}
+              ethValue={ethValue}
+              options={options}
             />
           </div>
           <div className="w-full max-w-65">
             <div className="flex flex-col space-y-4">
-              <Toggle
-                aria-label="Toggle bookmark"
-                size="sm"
-                variant="outline"
-                className="cursor-pointer"
-                onClick={() => setHidden(!hidden)}
-              >
-                {hidden ? <EyeOffIcon /> : <EyeIcon />}
-                Interest
-              </Toggle>
+              <div className="flex items-center space-x-2 ">
+                <Toggle
+                  aria-label="Toggle bookmark"
+                  size="sm"
+                  variant="outline"
+                  className="w-full cursor-pointer"
+                  onClick={() =>
+                    setOptions((prev) => ({ ...prev, hidden: !prev.hidden }))
+                  }
+                >
+                  {options.hidden ? <EyeOffIcon /> : <EyeIcon />}
+                  Interest
+                </Toggle>
+                {!options.hidden && (
+                  <div className="flex items-center space-x-2">
+                    <Label className="text-xs">ETH</Label>
+                    <Switch
+                      id="airplane-mode"
+                      className="cursor-pointer"
+                      checked={options.usd}
+                      onCheckedChange={() =>
+                        setOptions((prev) => ({ ...prev, usd: !prev.usd }))
+                      }
+                    />
+                    <Label className="text-xs">USDC</Label>
+                  </div>
+                )}
+              </div>
               <ExportFluidDailyAPR />
               {profitsAction.length > 0 && (
                 <ExportDistributedInterest profitsAction={profitsAction} />
