@@ -2,8 +2,8 @@ name: Update instadapp API Data
 
 on:
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:      # Permet de le lancer manuellement pour tester
+    - cron: "0 * * * *"
+  workflow_dispatch: # Permet de le lancer manuellement pour tester
 
 permissions:
   contents: write
@@ -19,7 +19,7 @@ jobs:
         run: |
           # 1. On récupère la réponse complète
           FULL_RES=$(curl -s "https://api.instadapp.io/v2/mainnet/lite/users/0x56e001745f105e34afe45398d7bc366db8fc5792/vaults")
-          
+
           # On vérifie si la réponse est bien un JSON valide et contient des données
           if [ -z "$FULL_RES" ] || [ "$FULL_RES" == "null" ]; then
             echo "Erreur: L'API a renvoyé une réponse vide"
@@ -27,9 +27,9 @@ jobs:
           fi
 
           # Extraction des valeurs avec des variables bien protégées par des guillemets
-          NET_APY=$(echo "$FULL_RES" | jq '.[0].apy.apyWithFee // 0 | tonumber')
-          GROSS_APY=$(echo "$FULL_RES" | jq '.[0].apy.apyWithoutFee // 0 | tonumber')
-          
+          NET_APY=$(echo "$FULL_RES" | jq '.[0].apy.apyWithoutFee // 0 | tonumber')
+          GROSS_APY=$(echo "$FULL_RES" | jq '.[0].apy.apyWithFee // 0 | tonumber')
+
           # 2. Création de la nouvelle entrée
           # Note l'utilisation de quotes autour des variables shell
           NEW_ENTRY=$(jq -n \
@@ -53,10 +53,10 @@ jobs:
           # 2. Configuration Git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           # 3. On ajoute le fichier
           git add data.json
-          
+
           # 4. On commit seulement s'il y a des changements
           if git diff --staged --quiet; then
             echo "Aucun changement à enregistrer."
