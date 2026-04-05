@@ -5,7 +5,7 @@ Createad with Next.js and shadcn/ui.
 ## How it works
 
 It is based on a workflow executed every hour by Github Actions.
-The worklfow request current APY form Fluid API
+The worklfow request current APY from Fluid API
 The workflow is available on the folder .github/workflows
 
 If you enter a wallet address and you click on Search, we request historical transactions to this wallet on Fluid API (the same API used for Fluid dashboard)
