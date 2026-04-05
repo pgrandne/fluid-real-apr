@@ -1,21 +1,17 @@
-# Next.js template
+# Compare your actual APR with Fluid’s displayed APR
 
-This is a Next.js template with shadcn/ui.
+Createad with Next.js and shadcn/ui.
 
-## Adding components
+## How it works
 
-To add components to your app, run the following command:
+It is based on a workflow executed every hour by Github Actions.
+The worklfow request current APY form Fluid API
+The workflow is available on the folder .github/workflows
 
-```bash
-npx shadcn@latest add button
-```
+If you enter a wallet address and you click on Search, we request historical transactions to this wallet on Fluid API (the same API used for Fluid dashboard)
 
-This will place the ui components in the `components` directory.
+## Respect for privacy
 
-## Using components
-
-To use the components in your app, import them as follows:
-
-```tsx
-import { Button } from "@/components/ui/button";
-```
+You can clone the repository and launch it in local.
+No data is collected.
+No wallet connection is necessary.

@@ -17,7 +17,6 @@ export async function POST(req: Request) {
     return new Response("Missing wallet", { status: 400 });
   }
 
-  // Visible in Vercel logs
   console.log("fetchTransactions wallet:", wallet);
 
   try {
